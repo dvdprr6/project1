@@ -1,8 +1,9 @@
 package ca.mcit.bigdata.project1
 
 
+import ca.mcit.bigdata.project1.enrich.{EnrichedTrip, TripRoute}
 import ca.mcit.bigdata.project1.input.InputSource
-import ca.mcit.bigdata.project1.model.Model
+import ca.mcit.bigdata.project1.model.{CalenderDate, Route, Trip}
 import ca.mcit.bigdata.project1.util.Constants
 
 object Launcher extends App {
@@ -11,20 +12,27 @@ object Launcher extends App {
     * File name is given by command line using option --file-name.
     * For example, --file-name=my-file.csv if the type is set to "csv" in configuration file
     */
-  //private val cmdLineOptions = new CommandLineOptionParser(args).parseOptions
+  private val cmdLineOptions = new CommandLineOptionParser(args).parseOptions
 
+  var tripInputSource = new InputSource(Constants.TRIPS, cmdLineOptions.trips)
+  var tripFileContents: List[Trip] = tripInputSource.parseFile().asInstanceOf[List[Trip]]
 
+  var routeInputSource = new InputSource(Constants.ROUTES, cmdLineOptions.routes)
+  var routeFileContents: List[Route] = routeInputSource.parseFile().asInstanceOf[List[Route]]
 
-  //val inputSource = new InputSource(fileReaderParser, cmdLineOptions.trips)
-  //val inputSource = new InputSource(fileReaderParser, "/home/david/Desktop/gtfs_stm/trips.txt")
-  var tripInputSource = new InputSource(Constants.TRIPS, "/home/david/Desktop/gtfs_stm/trips.txt")
-  var tripFileContents: List[Model] = tripInputSource.parseFile()
+  var calenderDateInputSource = new InputSource(Constants.CALENDER_DATES, cmdLineOptions.calender)
+  var calenderDateFileContents: List[CalenderDate] = calenderDateInputSource.parseFile().asInstanceOf[List[CalenderDate]]
 
-  var routeInputSource = new InputSource(Constants.ROUTES, "/home/david/Desktop/gtfs_stm/routes.txt")
-  var routeFileContents: List[Model] = routeInputSource.parseFile()
+  /** ENRICHMENT **/
+  var tripPairedList: List[(String, Trip)] = tripFileContents.map(trip => trip.routeId -> trip)
+  var routePairedList: List[(String, Route)] = routeFileContents.map(route => route.routeId -> route)
+  var calenderDatePairedList: List[(String, CalenderDate)] = calenderDateFileContents.map(calenderDate => calenderDate.serviceId -> calenderDate)
 
-  var calenderDateInputSource = new InputSource(Constants.CALENDER_DATES, "/home/david/Desktop/gtfs_stm/calendar_dates.txt")
-  var calenderDateContents: List[Model] = calenderDateInputSource.parseFile()
+  var tripRouteList: List[(String, TripRoute)] = tripPairedList.map(trip => trip._1 -> new TripRoute(trip._2, routePairedList.find(_._1 == trip._1).get._2))
+  var enrichedTripList: List[(String, EnrichedTrip)] = tripRouteList.map(tripRoute => tripRoute._2.trip.serviceId -> new EnrichedTrip(tripRoute._2, calenderDatePairedList.find(_._1 == tripRoute._2.trip.serviceId).get._2))
 
-  println(tripFileContents)
+  enrichedTripList.foreach((line: (String, EnrichedTrip)) => {
+      println(line)
+    }
+  )
 }
