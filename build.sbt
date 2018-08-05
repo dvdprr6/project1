@@ -7,7 +7,8 @@ scalaVersion := "2.12.6"
 
 libraryDependencies ++= Seq(
   "com.github.scopt" %% "scopt" % "3.5.0",
-  "com.typesafe" % "config" % "1.3.1"
+  "com.typesafe" % "config" % "1.3.1",
+  "com.github.tototoshi" %% "scala-csv" % "1.3.5"
 )
 
 assemblyJarName in assembly := "something.jar"
