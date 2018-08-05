@@ -27,6 +27,7 @@ class InputSource(var model: String, var file: String) {
     case Constants.TRIPS => DaoFactory.getDao(classOf[TripDao])
     case Constants.ROUTES => DaoFactory.getDao(classOf[RouteDao])
     case Constants.CALENDER_DATES => DaoFactory.getDao(classOf[CalenderDateDao])
+    case _ => throw new UnsupportedOperationException
   }
 
 }
