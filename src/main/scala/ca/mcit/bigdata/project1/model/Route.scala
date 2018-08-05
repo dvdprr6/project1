@@ -1,12 +1,12 @@
 package ca.mcit.bigdata.project1.model
 
 
-case class Route(routId: Int = 0,
+case class Route(routId: String = null,
                  agencyId: String = null,
-                 routeShortName: Int = 0,
+                 routeShortName: String = null,
                  routeLongName: String = null,
-                 routeType: Int = 0,
+                 routeType: String = null,
                  routeUrl: String = null,
                  routeColor: String = null,
-                 routeTextColor: String = null)
+                 routeTextColor: String = null) extends Model
 
